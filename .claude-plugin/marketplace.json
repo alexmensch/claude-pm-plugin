@@ -1,5 +1,5 @@
 {
-  "name": "pm-tools",
+  "name": "pm-plugins",
   "version": "0.2.0",
   "owner": {
     "name": "Alex Marshall"
@@ -8,7 +8,7 @@
     {
       "name": "new-feature",
       "source": "./plugins/new-feature",
-      "description": "A plugin with a strict feature development workflow that is anchored on test-driven acceptance and disciplined coding practices.",
+      "description": "Build new product features with a strict development workflow that is anchored on test-driven acceptance and disciplined coding practices.",
       "author": {
         "name": "Alex Marshall"
       },
