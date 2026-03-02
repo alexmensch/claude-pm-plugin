@@ -1,0 +1,13 @@
+{
+  "name": "pm-tools",
+  "owner": {
+    "name": "Alex Marshall",
+    "email": "hello@alxm.me"
+  },
+  "plugins": [
+    {
+      "name": "pm-plugin",
+      "source": "./pm-plugin",
+    }
+  ]
+}
