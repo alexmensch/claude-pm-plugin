@@ -1,4 +1,4 @@
-# PM Plugins for Claude Code
+# Software Development Lifecycle (SDL) Plugins for Claude Code
 
 A collection of Claude Code plugins for product managers and developers who want structured, disciplined feature development workflows.
 
