@@ -71,9 +71,11 @@ Explicitly list anything that is related to the requirements but should **not** 
 
 ### Step 4 — Confirm with the user
 
-Present the complete technical specification to the user and ask them to review it. Say:
+Present the complete technical specification to the user and use `AskUserQuestion` to ask them to review it. The question should be:
 
-> _"Please review this technical specification. Reply with **Approved** to proceed, or let me know what needs to change."_
+> _"Please review this technical specification. Select **Approved** to proceed, or select **Changes needed** and describe what needs to change."_
+
+Provide at least two options: one for approval and one to request changes. **You must use `AskUserQuestion` here — do not simply output text and continue.** Execution must pause until the user responds.
 
 **You must not return your output to the orchestrating session until the user has explicitly approved the specification.** This is critical because:
 
@@ -81,7 +83,7 @@ Present the complete technical specification to the user and ask them to review 
 2. If there are errors in the spec, they are cheapest to fix now, before tests and code are written.
 3. The user's approval here gates all downstream work.
 
-If the user requests changes, update the specification and present it again. Repeat until approved.
+If the user requests changes, update the specification and use `AskUserQuestion` again. Repeat until approved.
 
 Once approved, return the full technical specification as your output.
 
@@ -91,5 +93,5 @@ Once approved, return the full technical specification as your output.
 
 - Never write implementation code or test code — only the specification.
 - Never skip or rush the codebase analysis. Read more files rather than fewer.
-- Never return output to the orchestrating session without user approval.
+- Never return output to the orchestrating session without user approval via `AskUserQuestion`.
 - If the requirements you received are still ambiguous after your codebase analysis reveals new context, note the ambiguity clearly in the specification and flag it to the user during confirmation.
