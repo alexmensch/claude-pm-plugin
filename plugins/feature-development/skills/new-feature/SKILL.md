@@ -41,6 +41,16 @@ When implementing a new feature or new functionality in an existing codebase, yo
       ```
    4. Verify the test files are present: run `git log --oneline -3` to confirm the merge commit is visible.
 
+   **Before running tests**, compare the test-writer's expectations against your implementation and identify any meaningful design discrepancies. These are cases where the test-writer made a different but valid design decision — different naming, different parameter shapes, different return structures, different abstractions. This is normal and expected when two agents work from the same spec in parallel.
+
+   If discrepancies exist, do not silently resolve them. Use `AskUserQuestion` to present each one clearly to the user:
+   - Describe what the test expects
+   - Describe what your implementation does
+   - Explain the trade-off or difference between the two approaches
+   - Ask which direction the user wants to go
+
+   The user's answer determines what changes — either the implementation is adjusted to match the tests, or (with the user's explicit approval) the tests are updated to match the implementation. In either case, do not proceed until the user has confirmed the resolution for every discrepancy.
+
    Then run all tests for the whole project. In no circumstances will you change any code in the tests without confirming with the user first. The strong principle here is that tests are written to cover desired functionality, not just to pass. Never change tests just to make them pass — you must determine whether there is a genuine bug in the code you wrote first. If you think there is a bug in a test, confirm with the user first. This step is completed when all tests pass.
 5. Next, invoke the code-reviewer agent. It will review all changes on the branch, present findings to the user, make the user's approved changes, and create a single commit for the code review fixes. After the code-reviewer completes: if the original requirements were provided as a file on disk (step 2), and the code-reviewer made any changes, append an "Out-of-spec changes" section to the requirements file documenting those changes. Use the `define-feature` skill to produce the correctly-formatted table rows if it is available; otherwise write the rows directly. Use the same table format as the requirements table. This section is an audit record of changes that were made outside the original specification.
 6. Run the linting tool that's configured for the project.
@@ -80,7 +90,7 @@ The data handovers and sequencing listed in the steps above are:
 1. User input (file or chat) -> you clarify or read file -> requirements passed to technical-spec agent (foreground); GUID stored if present in file
 2. technical-spec agent analyses codebase, produces spec, confirms with user in its own session -> approved technical spec returned to you
 3. You hand the approved spec to test-writer (background, isolated worktree) AND begin writing code yourself — these happen in parallel
-4. test-writer writes tests and reports what it created -> you commit its work in the worktree, merge into the feature branch, and remove the worktree -> verify test commit is present -> run all tests
+4. test-writer writes tests and reports what it created -> you commit its work in the worktree, merge into the feature branch, and remove the worktree -> verify test commit is present -> compare test expectations against implementation and present any design discrepancies to the user for resolution -> run all tests
 5. code-reviewer reviews, presents findings to user, makes approved fixes, commits -> if requirements came from a file and changes were made, append out-of-spec section to requirements file
 6. Remaining steps (lint, build, docs, semver, PR with GUID) completed in order
 7. If requirements came from a file and ROADMAP.md exists: feature moved from planned to shipped table, sequence renumbered, committed
