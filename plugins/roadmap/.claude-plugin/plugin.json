@@ -1,5 +1,5 @@
 {
-  "name": "plan-roadmap",
+  "name": "roadmap",
   "description": "Roadmap planning plugin for organising feature requirements into sequenced, release-grouped plans and communicating them in user-benefit terms.",
   "version": "0.1.0"
 }

@@ -6,9 +6,9 @@
   },
   "plugins": [
     {
-      "name": "define-feature",
-      "source": "./plugins/define-feature",
-      "description": "Turn unstructured feature ideas into a precise requirements table through structured brainstorming. Output feeds directly into the build-feature plugin.",
+      "name": "feature-definition",
+      "source": "./plugins/feature-definition",
+      "description": "Turn unstructured feature ideas into a precise requirements table through structured brainstorming. Output feeds directly into the feature-development plugin.",
       "author": {
         "name": "Alex Marshall"
       },
@@ -23,8 +23,8 @@
       ]
     },
     {
-      "name": "build-feature",
-      "source": "./plugins/build-feature",
+      "name": "feature-development",
+      "source": "./plugins/feature-development",
       "description": "Build new product features with a strict development workflow that is anchored on test-driven acceptance and disciplined coding practices.",
       "author": {
         "name": "Alex Marshall"
@@ -39,8 +39,8 @@
       ]
     },
     {
-      "name": "plan-roadmap",
-      "source": "./plugins/plan-roadmap",
+      "name": "roadmap",
+      "source": "./plugins/roadmap",
       "description": "Organise defined feature requirements into a sequenced, release-grouped roadmap and communicate it in user-benefit terms.",
       "author": {
         "name": "Alex Marshall"
