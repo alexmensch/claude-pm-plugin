@@ -33,7 +33,33 @@ Summarise what you found to the user: how many requirements files exist, what th
 
 ---
 
-### Step 2 — Understand intent
+### Step 2 — Understand target users
+
+Before proposing any structure, build a profile of the people this product is for. This information will be stored in the roadmap and is used by both the `communicate-roadmap` skill and feature development workflows to ensure decisions stay grounded in real user needs.
+
+Check whether `./requirements/ROADMAP.md` already contains a `## Target Users` section. If it does, read the existing profiles and present them to the user. Ask whether they are still accurate or need updating. If there is no existing profile, gather the following.
+
+Use `AskUserQuestion` to ask focused questions about who the target users are. Don't ask all at once — lead with the most essential question and follow up. Cover:
+
+**Who they are**
+- What is the user's role, context, or situation? (e.g. "a freelance designer managing multiple clients", "a small engineering team without a dedicated ops function")
+- Are there multiple distinct user types? If so, treat each as a separate persona and ask about them individually.
+
+**What they care about**
+- What is the primary outcome they are trying to achieve? What does success look like for them?
+- What frustrates them today — what takes too long, breaks down, or requires workarounds?
+- What trade-offs matter to them? (e.g. speed vs. precision, simplicity vs. power, cost vs. control)
+
+**Their context**
+- How technically sophisticated are they? Do they work with tools like this regularly, or is this a new capability for them?
+- What triggers them to use this product — is it a recurring need, a crisis, a workflow step?
+- Are there constraints or sensitivities to be aware of? (e.g. compliance requirements, low tolerance for downtime, limited time to learn new tools)
+
+Once you have a clear picture of each persona, write a short profile for each (3–6 sentences) that captures: who they are, what they are trying to do, what frustrates them, and what they need from this product. Present the profiles to the user using `AskUserQuestion` and ask them to confirm or revise before proceeding.
+
+---
+
+### Step 3 — Understand intent
 
 Before proposing any structure, ask focused questions to understand the roadmap owner's intent. Prioritise these areas:
 
@@ -54,7 +80,7 @@ Do not ask all of these at once. Lead with the most important questions first, a
 
 ---
 
-### Step 3 — Propose and refine the structure
+### Step 4 — Propose and refine the structure
 
 Once you have enough input, propose a draft roadmap structure. Present:
 
@@ -70,7 +96,7 @@ Use `AskUserQuestion` to present the draft and ask the user to approve or refine
 
 ---
 
-### Step 4 — Draft the overview
+### Step 5 — Draft the overview
 
 Once the structure is confirmed, draft the **Overview** section of the roadmap. This section is written for a fresh LLM context — it should explain:
 
@@ -85,9 +111,9 @@ Present the draft overview to the user using `AskUserQuestion` and ask them to a
 
 ---
 
-### Step 5 — Write the output
+### Step 6 — Write the output
 
-Once both the structure and the overview are confirmed, write `./requirements/ROADMAP.md` using the format below. Then tell the user the file has been written and summarise the roadmap briefly.
+Once the structure, user profiles, and overview are all confirmed, write `./requirements/ROADMAP.md` using the format below. Then tell the user the file has been written and summarise the roadmap briefly.
 
 ---
 
@@ -99,6 +125,18 @@ Once both the structure and the overview are confirmed, write `./requirements/RO
 ## Overview
 
 [Overview text — written for a fresh LLM context. Explains product purpose, sequencing principles, key constraints, and the rationale behind the current plan structure.]
+
+---
+
+## Target Users
+
+### [Persona Name or Role]
+
+[3–6 sentence profile. Who they are, what they are trying to accomplish, what frustrates them today, and what they need from this product. Written in plain prose — no bullet lists.]
+
+### [Second Persona, if applicable]
+
+[3–6 sentence profile.]
 
 ---
 
@@ -137,6 +175,8 @@ Rules for the format:
 - If there are no shipped features, omit the Shipped section entirely.
 - If there is only one planned release, omit the release heading and just use the single table under a `## Planned` heading.
 - The overview is plain prose — no bullet lists or sub-sections unless genuinely needed for clarity.
+- Each persona profile is plain prose — no bullet lists. The persona name or role is the heading.
+- If there is only one user type, use `## Target Users` as a flat section with a single prose profile rather than a sub-heading.
 
 ---
 
@@ -147,3 +187,4 @@ Rules for the format:
 - **Surface incompatibilities, don't resolve them.** If planning reveals that two features make contradictory assumptions, say so clearly and direct the user to `define-feature`. Do not attempt to reconcile requirements yourself.
 - **The roadmap is a plan, not a promise.** It reflects the current best thinking about sequencing. It should be easy to update as things change.
 - **Don't plan what doesn't exist.** If the user wants to add a feature idea that has no requirements file, direct them to `define-feature` first. This skill works with what has been defined.
+- **Know who you're building for.** Every sequencing and grouping decision should be testable against the target user profiles. If a feature ordering can't be explained in terms of user benefit, it probably needs to change.
