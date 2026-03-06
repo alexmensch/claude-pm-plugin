@@ -13,8 +13,26 @@ When implementing a new feature or new functionality in an existing codebase, yo
    **If the user has described the feature in chat** (no file provided): require descriptive precision. If there is ambiguity in what the user is requesting, without being pedantic, ask for clarification. Once you have a clear understanding of the requirements, summarise what you are about to pass to the technical-spec agent and use `AskUserQuestion` to ask the user to confirm before you proceed.
 
    In both cases, only after the user confirms should you invoke the technical-spec agent. The technical-spec agent will deeply analyse the codebase, produce a structured technical specification with a requirements table, and confirm the spec with the user within its own session. You will receive the approved spec back.
-3. Once you have the approved technical spec, start two things in parallel: hand the full technical spec to the test-writer agent (which runs in the background in an isolated worktree, and must be invoked with Write and Edit tool permissions), and begin writing implementation code yourself against the same spec. Both you and test-writer work from the requirements table in the technical spec. The test-writer will commit its tests, merge them into the current branch, and remove its own worktree before it returns — you do not need to handle any of this.
-4. Once both you and the test-writer agent have finished, verify that the test files are present in the current branch (run `git log --oneline -3` to confirm the test commit is visible). Then run all tests for the whole project. In no circumstances will you change any code in the tests without confirming with the user first. The strong principle here is that tests are written to cover desired functionality, not just to pass. Never change tests just to make them pass — you must determine whether there is a genuine bug in the code you wrote first. If you think there is a bug in a test, confirm with the user first. This step is completed when all tests pass.
+3. Once you have the approved technical spec, start two things in parallel: hand the full technical spec to the test-writer agent (which runs in the background in an isolated worktree, and must be invoked with Write and Edit tool permissions), and begin writing implementation code yourself against the same spec. Both you and test-writer work from the requirements table in the technical spec.
+4. Once both you and the test-writer agent have finished, you must merge the test-writer's work into the current branch. The test-writer does not perform any git operations — it writes test files and reports what it created, but leaves the worktree uncommitted. When the test-writer's Task completes, its result will include the worktree path and branch name. Do the following in order:
+
+   1. Commit the test-writer's work inside its worktree:
+      ```bash
+      git -C "<worktree_path>" add -A && git -C "<worktree_path>" commit -m "Add tests for [feature name]"
+      ```
+   2. Merge the test-writer's branch into your current feature branch:
+      ```bash
+      git merge <worktree_branch> --no-edit
+      ```
+      If this merge produces a conflict, stop and ask the user how to proceed.
+   3. Remove the worktree and its branch:
+      ```bash
+      git worktree remove <worktree_path> --force
+      git branch -d <worktree_branch>
+      ```
+   4. Verify the test files are present: run `git log --oneline -3` to confirm the merge commit is visible.
+
+   Then run all tests for the whole project. In no circumstances will you change any code in the tests without confirming with the user first. The strong principle here is that tests are written to cover desired functionality, not just to pass. Never change tests just to make them pass — you must determine whether there is a genuine bug in the code you wrote first. If you think there is a bug in a test, confirm with the user first. This step is completed when all tests pass.
 5. Next, invoke the code-reviewer agent. It will review all changes on the branch, present findings to the user, make the user's approved changes, and create a single commit for the code review fixes. After the code-reviewer completes: if the original requirements were provided as a file on disk (step 2), and the code-reviewer made any changes, append an "Out-of-spec changes" section to the requirements file documenting those changes. Use the `define-feature` skill to produce the correctly-formatted table rows if it is available; otherwise write the rows directly. Use the same table format as the requirements table. This section is an audit record of changes that were made outside the original specification.
 6. Run the linting tool that's configured for the project.
 7. Run either the build command or mock deploy command for the project to ensure there are no build errors. Ensure that you do not build or deploy the project to production, you are only ensuring the project builds, deploys, or compiles correctly.
@@ -47,7 +65,7 @@ The data handovers and sequencing listed in the steps above are:
 1. User input (file or chat) -> you clarify or read file -> requirements passed to technical-spec agent (foreground); GUID stored if present in file
 2. technical-spec agent analyses codebase, produces spec, confirms with user in its own session -> approved technical spec returned to you
 3. You hand the approved spec to test-writer (background, isolated worktree) AND begin writing code yourself — these happen in parallel
-4. test-writer commits its tests, merges them into the current branch, and removes its own worktree -> you verify test commit is present -> run all tests
+4. test-writer writes tests and reports what it created -> you commit its work in the worktree, merge into the feature branch, and remove the worktree -> verify test commit is present -> run all tests
 5. code-reviewer reviews, presents findings to user, makes approved fixes, commits -> if requirements came from a file and changes were made, append out-of-spec section to requirements file
 6. Remaining steps (lint, build, docs, semver, PR with GUID) completed in order
 

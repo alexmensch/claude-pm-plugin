@@ -87,39 +87,17 @@ Evaluate the results:
 
 ---
 
-### Step 5 — Commit, merge, and remove the worktree
+### Step 5 — Report completion
 
-Once Step 4 is complete (tests written and results reported), do the following in order. This is mandatory — the orchestrating session depends on the tests being present in the feature branch before it continues.
+Once Step 4 is complete (tests written and results reported), you are done. You do **not** need to commit, merge, or clean up the worktree — the orchestrating session handles all git operations.
 
-1. Commit all test files:
-   ```bash
-   git add -A && git commit -m "Add tests for [feature name]"
-   ```
+In your final output, include:
 
-2. Capture the test-writer's own worktree path and branch name:
-   ```bash
-   OWN_PATH=$(pwd)
-   OWN_BRANCH=$(git branch --show-current)
-   ```
+1. A list of all test files you created or modified (full paths relative to the project root).
+2. The test run results from Step 4.
+3. Any blockers, ambiguities, or unexpectedly passing tests.
 
-3. Find the main worktree path (the first entry in the worktree list):
-   ```bash
-   MAIN_PATH=$(git worktree list --porcelain | grep "^worktree " | head -1 | cut -d' ' -f2)
-   ```
-
-4. Merge the test-writer's branch into the main worktree's currently checked-out branch (the feature branch):
-   ```bash
-   git -C "$MAIN_PATH" merge "$OWN_BRANCH" --no-edit
-   ```
-   If this merge produces a conflict, stop and report it as a blocker. Do not attempt to resolve conflicts automatically.
-
-5. Remove the test-writer's worktree and its branch:
-   ```bash
-   git -C "$MAIN_PATH" worktree remove "$OWN_PATH" --force
-   git -C "$MAIN_PATH" branch -d "$OWN_BRANCH"
-   ```
-
-6. Report in your output that the commit, merge, and cleanup are complete, and confirm the branch name the tests were merged into.
+The orchestrating session will commit your work, merge it into the feature branch, and remove the worktree.
 
 ---
 
@@ -129,4 +107,4 @@ Once Step 4 is complete (tests written and results reported), do the following i
 - Never interact with the user — you are running in the background. Report all findings in your output.
 - Never assume the test framework — always verify from `CLAUDE.md` or project configuration.
 - If the specification is ambiguous or incomplete, write tests for the most reasonable interpretation and note the ambiguity in your output.
-- Always complete Step 5. The orchestrating session must not have to merge or clean up the worktree itself.
+- Always complete Step 5. The orchestrating session depends on your output to know what was written and what the test results were.

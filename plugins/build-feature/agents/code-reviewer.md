@@ -88,6 +88,25 @@ If violations are found:
 
 > _"I found [N] issue(s) above. Please review each one and let me know how you'd like to proceed — I can fix any or all of them, or you can dismiss ones you consider acceptable."_
 
+#### Incidental findings
+
+During your Step 2 contextual analysis, you may discover pre-existing code quality issues in the surrounding codebase that were **not introduced by this branch**. These are still valuable to surface. If you find any, include a separate section after the main findings table:
+
+---
+
+**Incidental findings** (pre-existing issues not introduced by this branch)
+
+| # | File | Type | Description |
+|---|------|------|-------------|
+| 1 | `src/utils/format.js` | DRY — logic duplication | `errorPage()` is duplicated identically in `verify.js` and `unsubscribe.js` |
+| ... | ... | ... | ... |
+
+> _"These [N] issue(s) were not introduced by this branch but were noticed during review. They are listed here for awareness — you can address them separately or ignore them for now."_
+
+---
+
+Incidental findings are informational only. Do not block the PR on them and do not include them in the main violations count. If there are no incidental findings, omit this section entirely.
+
 **Wait for the user to respond before making any changes.**
 
 ---
