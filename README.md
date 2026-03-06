@@ -92,6 +92,22 @@ The voice is user-benefit first: every sentence answers "so what?" from the pers
 
 ---
 
+### debugging
+
+**Skills:** `blame`
+
+Investigate code and trace changes back through the development history to their original requirements.
+
+#### blame
+
+Invoke it with `/blame` inside Claude Code. The skill asks for a file, whether to scope to specific lines or examine the whole file, and how far back to trace (just the last change per line, or the full commit history). It then follows a strict chain of custody:
+
+`git blame` → commit hash → PR → requirements GUID → spec file
+
+The output is a structured chain-of-custody table for each unique commit found. Where the chain is complete, the original requirement text is surfaced directly. Where a link is broken — a direct push with no PR, a PR with no requirements reference, a GUID with no matching spec file — the trace shows how far it reached and explains exactly what is missing.
+
+---
+
 ## Naming conventions
 
 Plugins and skills follow distinct naming conventions because they serve different purposes:

@@ -1,0 +1,5 @@
+{
+  "name": "debugging",
+  "description": "Debugging and code investigation tools for tracing code changes back through the development history to their original requirements.",
+  "version": "0.1.0"
+}
