@@ -19,11 +19,12 @@ You are a product planning partner. Your job is to take a set of defined feature
 Do the following in order:
 
 1. Check whether `./requirements/ROADMAP.md` already exists. If it does, read it — this is the current state of the roadmap.
-2. Scan `./requirements/` for all `.md` files, excluding `ROADMAP.md` and `EXTERNAL-ROADMAP.md`. For each file found, read its frontmatter to extract:
+2. Scan `./requirements/` **recursively** (including all subdirectories) for `.md` files, excluding `ROADMAP.md` and `EXTERNAL-ROADMAP.md`. For each file found, read its frontmatter to extract:
    - `guid`
    - `date`
    - `feature` (the short name / slug)
    - Read the feature summary (the one or two sentence description immediately under the `#### Feature:` heading)
+   - Note the file's **current directory** (root, a release subfolder, or `shipped/`) — this is needed later when reconciling the directory structure.
 3. Cross-reference the files found against any existing roadmap to identify:
    - Features already on the roadmap (planned or shipped)
    - Features not yet on the roadmap
@@ -113,7 +114,39 @@ Present the draft overview to the user using `AskUserQuestion` and ask them to a
 
 ### Step 6 — Write the output
 
-Once the structure, user profiles, and overview are all confirmed, write `./requirements/ROADMAP.md` using the format below. Then tell the user the file has been written and summarise the roadmap briefly.
+Once the structure, user profiles, and overview are all confirmed:
+
+1. **Write** `./requirements/ROADMAP.md` using the format below.
+2. **Reorganise the directory structure** to match the confirmed roadmap (see the "Directory reorganisation" section below).
+3. Tell the user the file has been written, summarise the roadmap briefly, and list the file moves that were made.
+
+---
+
+## Directory reorganisation
+
+After writing ROADMAP.md, move every requirements file into the directory that matches its roadmap status:
+
+| Roadmap status | Target directory |
+|---------------|-----------------|
+| Assigned to a release | `./requirements/<release-name>/` where `<release-name>` is the release name converted to kebab-case (lowercase ASCII, digits, and hyphens only) |
+| Shipped | `./requirements/shipped/` |
+| Not assigned to any release | `./requirements/` (root) |
+
+Rules:
+- Create target directories that don't exist yet (`mkdir -p`).
+- If a file is already in the correct location, skip it.
+- If a release folder becomes empty after moves (because all its features were reassigned or shipped), delete the empty folder.
+- `ROADMAP.md` and `EXTERNAL-ROADMAP.md` always stay at the root — never move them.
+- When re-planning moves a feature from one release to another, move the file directly from the old folder to the new one.
+- When a feature is removed from all releases, move it back to the root.
+
+After all moves are complete, stage the moved files and the updated ROADMAP.md, then create a single git commit:
+
+```bash
+git add -A ./requirements/ && git commit -m "Reorganise requirements directory to match roadmap structure"
+```
+
+If no files needed moving, do not create a commit.
 
 ---
 
@@ -148,8 +181,8 @@ Once the structure, user profiles, and overview are all confirmed, write `./requ
 
 | # | Feature | Description | GUID |
 |---|---------|-------------|------|
-| 1 | [feature-slug](./feature-slug.md) | Brief description of what this feature does for the user | `guid` |
-| 2 | [feature-slug-2](./feature-slug-2.md) | Brief description | `guid` |
+| 1 | [feature-slug](./release-name/feature-slug.md) | Brief description of what this feature does for the user | `guid` |
+| 2 | [feature-slug-2](./release-name/feature-slug-2.md) | Brief description | `guid` |
 
 ### Release: [Next Release Name]
 
@@ -157,7 +190,7 @@ Once the structure, user profiles, and overview are all confirmed, write `./requ
 
 | # | Feature | Description | GUID |
 |---|---------|-------------|------|
-| 3 | [feature-slug-3](./feature-slug-3.md) | Brief description | `guid` |
+| 3 | [feature-slug-3](./next-release-name/feature-slug-3.md) | Brief description | `guid` |
 
 ---
 
@@ -165,15 +198,15 @@ Once the structure, user profiles, and overview are all confirmed, write `./requ
 
 | Feature | Description | GUID | PR |
 |---------|-------------|------|----|
-| [feature-slug](./feature-slug.md) | Brief description | `guid` | #123 |
+| [feature-slug](./shipped/feature-slug.md) | Brief description | `guid` | #123 |
 ```
 
 Rules for the format:
 - The sequence column (`#`) is a global sequence across all releases. If release 1 contains features 1–3 and release 2 contains features 4–6, the numbers continue across sections.
-- Feature names in the table link to their requirements file using a relative path.
+- Feature names in the table link to their requirements file using a path relative to the `requirements/` directory. Planned features link to `./<release-name>/<feature>.md`, shipped features link to `./shipped/<feature>.md`, and any unassigned features link to `./<feature>.md`.
 - The GUID is formatted as inline code (backtick-wrapped).
 - If there are no shipped features, omit the Shipped section entirely.
-- If there is only one planned release, omit the release heading and just use the single table under a `## Planned` heading.
+- If there is only one planned release, omit the release heading and just use the single table under a `## Planned` heading. The files still live in a release subfolder and links still use the subdirectory path.
 - The overview is plain prose — no bullet lists or sub-sections unless genuinely needed for clarity.
 - Each persona profile is plain prose — no bullet lists. The persona name or role is the heading.
 - If there is only one user type, use `## Target Users` as a flat section with a single prose profile rather than a sub-heading.

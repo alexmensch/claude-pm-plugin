@@ -90,9 +90,29 @@ feature: <kebab-case-slug>
 
 The `guid` is used to link requirements files to PRs (via the PR body) and to the roadmap.
 
+### Requirements directory structure
+
+The `requirements/` directory is organised into subdirectories that mirror the roadmap:
+
+```
+requirements/
+  ROADMAP.md                    # Always at root
+  EXTERNAL-ROADMAP.md           # Always at root
+  unassigned-feature.md         # Not yet assigned to a release
+  release-name/                 # Kebab-cased release name
+    feature-in-release.md
+  shipped/                      # Completed features
+    completed-feature.md
+```
+
+- `define-feature` writes new files to the root (unassigned).
+- `plan-roadmap` moves files into release subfolders (and `shipped/`) after the user approves the roadmap structure, then auto-commits the moves.
+- `new-feature` moves a file to `shipped/` when marking it as shipped, then auto-commits.
+- `blame` and `write-changelog` search recursively, so they work with any directory layout.
+
 ### ROADMAP.md format
 
-The roadmap file at `requirements/ROADMAP.md` is owned by the `plan-roadmap` skill and contains: Overview, Target Users, Planned (release-grouped feature tables with global sequence numbers and GUIDs), and Shipped (features with PR numbers). The `new-feature` skill updates the shipped table automatically after a PR is created.
+The roadmap file at `requirements/ROADMAP.md` is owned by the `plan-roadmap` skill and contains: Overview, Target Users, Planned (release-grouped feature tables with global sequence numbers and GUIDs), and Shipped (features with PR numbers). Feature links use subdirectory-relative paths (e.g. `./release-name/feature.md`, `./shipped/feature.md`). The `new-feature` skill updates the shipped table automatically after a PR is created.
 
 ### PR format
 
