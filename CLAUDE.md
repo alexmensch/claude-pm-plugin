@@ -14,6 +14,8 @@ plugins/
   feature-definition/       # Plugin: define features before building them
     .claude-plugin/plugin.json
     skills/define-feature/SKILL.md
+    agents/
+      user-researcher.md      # Web research to validate the user problem (runs in foreground)
 
   feature-development/      # Plugin: end-to-end feature implementation workflow
     .claude-plugin/plugin.json
@@ -68,6 +70,9 @@ Agents are invoked by orchestrating skills and never interact directly with the 
 - **test-writer** — runs in the background in an isolated worktree, reports what it created
 - **coverage-reviewer** — runs in the foreground, returns a coverage report (or skips if no coverage tooling is detected)
 - **code-reviewer** — runs in the foreground, returns a findings report to the orchestrator
+
+**feature-definition** (invoked by `define-feature`):
+- **user-researcher** — runs in the foreground, researches whether the user problem exists, how people solve it today, and gaps in existing solutions
 
 **roadmap** (invoked by `plan-roadmap`):
 - **persona-researcher** — runs in the foreground, conducts web research to validate/challenge persona claims, returns a structured report

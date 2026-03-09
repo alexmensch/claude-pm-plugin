@@ -36,6 +36,22 @@ As the conversation develops, probe the following areas. Not all of them will ap
 - If the user is proposing a specific solution, ask whether they've considered alternatives. A feature that solves the same problem with less surface area is almost always better.
 - If you think a proposed requirement is unnecessary or could be cut without losing meaningful user value, say so clearly and ask the user to justify it.
 
+#### Offering user problem research
+
+Once you have a clear problem statement — one that's specific enough to formulate useful web searches — offer to run user research. Use `AskUserQuestion` to ask whether the user wants to validate the problem through market research before continuing. This is optional; the user can decline and continue sharpening the feature normally.
+
+If the user accepts, invoke the `user-researcher` agent in the foreground, passing it:
+- The problem statement as you currently understand it (the refined version from conversation, not just the user's original input)
+- Any available product context (what the product is, what domain it operates in)
+
+The agent returns a structured report covering: (1) whether the problem exists and how users experience it, (2) how people solve it today, and (3) what's broken about existing solutions.
+
+When the report comes back:
+1. Present the full findings to the user.
+2. Resume the step 2 conversation naturally. Use the findings to inform your ongoing challenges — especially under "Necessity." For example, if the agent found that the problem is already well-solved by existing tools, raise that directly. If it found that users experience the problem differently than stated, explore whether the feature's framing needs to change.
+
+Do not force a decision point based on the findings. The research informs the conversation; it doesn't gate it. The user decides whether to continue, revise, or abandon.
+
 **Scope**
 - Is this the right size? Features that are too large are hard to specify, hard to test, and hard to ship. Features that are too small may not address the real problem.
 - Are there requirements that feel speculative or "nice to have" rather than essential? Push back and ask the user to justify them in terms of concrete user impact.
