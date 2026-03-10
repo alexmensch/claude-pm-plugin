@@ -142,8 +142,13 @@ Present the draft overview to the user using `AskUserQuestion` and ask them to a
 Once the structure, user profiles, and overview are all confirmed:
 
 1. **Write** `./product/ROADMAP.md` using the format below.
-2. **Reorganise the directory structure** to match the confirmed roadmap (see the "Directory reorganisation" section below).
-3. Tell the user the file has been written, summarise the roadmap briefly, and list the file moves that were made.
+2. **Renumber the global sequence** by running the bundled script. This ensures sequence numbers are correct without relying on inference:
+   ```bash
+   python "${CLAUDE_SKILL_DIR}/scripts/renumber-roadmap.py" ./product/ROADMAP.md
+   ```
+   Always run this script after writing or modifying ROADMAP.md — it is the single source of truth for sequence numbering.
+3. **Reorganise the directory structure** to match the confirmed roadmap (see the "Directory reorganisation" section below).
+4. Tell the user the file has been written, summarise the roadmap briefly, and list the file moves that were made.
 
 ---
 
@@ -235,6 +240,35 @@ Rules for the format:
 - The overview is plain prose — no bullet lists or sub-sections unless genuinely needed for clarity.
 - Each persona profile is plain prose — no bullet lists. The persona name or role is the heading.
 - If there is only one user type, use `## Target Users` as a flat section with a single prose profile rather than a sub-heading.
+
+---
+
+## Marking a feature as shipped
+
+Other skills (e.g. `new-feature`) may invoke this skill in an agent context with a narrow instruction: mark a specific feature as shipped. When you receive a request like this — containing a feature slug, GUID, and requirements file path — skip the full planning process (steps 1–6) and perform only these actions:
+
+1. Read `./product/ROADMAP.md`. Find the feature's row in the planned tables by matching the GUID.
+2. Remove the row from its release section. If the release section has no remaining feature rows, remove the entire section (heading, description, and table).
+3. Add the feature to the Shipped table without a PR number (leave the PR column empty). If no Shipped section exists, create one following the format in the "ROADMAP.md format" section above. The shipped entry's link must point to `./shipped/<feature-slug>.md`. Copy the description from the planned row.
+4. Renumber the global sequence by running the bundled script:
+   ```bash
+   python "${CLAUDE_SKILL_DIR}/scripts/renumber-roadmap.py" ./product/ROADMAP.md
+   ```
+5. Move the requirements file to `./product/shipped/`:
+   ```bash
+   mkdir -p ./product/shipped/
+   git mv <current-path> ./product/shipped/<feature-slug>.md
+   ```
+6. If the release subfolder the file came from is now empty, remove it:
+   ```bash
+   rmdir ./product/<release-name>/  # only succeeds if empty
+   ```
+7. Stage and commit:
+   ```bash
+   git add ./product/ && git commit -m "Update roadmap: mark <feature-slug> as shipped"
+   ```
+
+Return a short summary: whether it succeeded, the feature slug and GUID processed, and the release section the feature was removed from.
 
 ---
 
