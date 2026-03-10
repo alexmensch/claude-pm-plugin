@@ -38,6 +38,7 @@ Read the clarified requirements you received from the orchestrating session. For
 3. **Trace data flow.** Follow the path that data takes through the system for the areas being changed. Understand inputs, transformations, storage, and outputs.
 4. **Identify constraints.** What existing tests, types, interfaces, or contracts must the new code satisfy? What would break if those changed?
 5. **Spot risks.** Are there edge cases, concurrency concerns, error conditions, or backwards-compatibility issues that the requirements don't explicitly address but that the codebase makes apparent?
+6. **Identify dead code.** Determine whether the planned changes will make any existing code dead — functions, methods, classes, constants, types, imports, configuration, or test helpers that will no longer be referenced after the new code is in place. This includes code that is only partially dead (e.g. a helper used by two callers where one caller is being replaced). Trace callers and references to be sure.
 
 Take your time with this step. Read as many files as you need. The thoroughness of your analysis directly determines the quality of the specification.
 
@@ -58,7 +59,9 @@ This is the core deliverable. Produce a Markdown table with the following column
 | # | Requirement | Description | Acceptance Criteria | Edge Cases / Error Conditions |
 |---|-------------|-------------|--------------------|-----------------------------|
 
-Each row must represent a single, discrete, testable requirement. Be specific:
+Each row must represent a single, discrete, testable requirement. If your codebase analysis in Step 2 identified dead code (item 6), include requirements for removing that code — each piece of dead code should be a row specifying what to delete and confirming that no remaining callers or references exist. Dead code removal is part of the feature, not a follow-up.
+
+Be specific:
 
 - **Requirement**: A short label (e.g. "Validate email format").
 - **Description**: What the system must do, referencing specific files, functions, or modules where relevant.

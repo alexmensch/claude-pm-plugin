@@ -74,13 +74,14 @@ When implementing a new feature or new functionality in an existing codebase, yo
    The user's answer determines what changes — either the implementation is adjusted to match the tests, or (with the user's explicit approval) the tests are updated to match the implementation. In either case, do not proceed until the user has confirmed the resolution for every discrepancy.
 
    Then run all tests for the whole project. In no circumstances will you change any code in the tests without confirming with the user first. The strong principle here is that tests are written to cover desired functionality, not just to pass. Never change tests just to make them pass — you must determine whether there is a genuine bug in the implementation first. If you think there is a bug in a test, confirm with the user first. This step is completed when all tests pass.
-5. Before the code review, check whether the project has code coverage tooling. Invoke the coverage-reviewer agent — it runs in the foreground and returns a structured report. The agent will detect coverage tooling automatically; if none is found, it returns a skip message and you move on to step 6.
+5. Before the code review, invoke the coverage-reviewer agent in a **foreground agent** (not inline — use the Agent tool so its analysis stays out of the main session context). The agent detects coverage tooling automatically; if none is found, it returns a skip message and you move on to step 6.
 
    If the agent returns coverage findings:
 
-   1. Present the full coverage report to the user using `AskUserQuestion`. Ask the user which uncovered areas (if any) they want tests added for, and which they accept as-is.
-   2. For any areas the user wants covered: write the additional tests yourself, following the existing test patterns in the codebase. Run the full test suite to confirm nothing is broken.
-   3. Create a **single commit** containing all coverage-related test additions.
+   1. Present **every finding** from the coverage report to the user using `AskUserQuestion` — do not summarise, truncate, or cap the number of items. The agent may return 1 finding or 20; present all of them exactly as reported. Ask the user which uncovered areas they want tests added for, and which they accept as-is.
+   2. If the report includes **incidental findings** (pre-existing coverage gaps in files touched by this branch, issues noticed during analysis, or suggestions beyond the strict uncovered-lines table), present those separately to the user using `AskUserQuestion` and ask which ones they want addressed. Do not silently discard incidental findings.
+   3. For any areas the user wants covered: write the additional tests yourself, following the existing test patterns in the codebase. Run the full test suite to confirm nothing is broken.
+   4. Create a **single commit** containing all coverage-related test additions.
 
    If coverage is already complete or the user accepts all gaps, proceed without changes.
 6. Next, invoke the code-reviewer agent. It will analyse the branch and return a structured findings report — it does not interact with the user or make any changes. Once you receive the report:
@@ -95,11 +96,11 @@ When implementing a new feature or new functionality in an existing codebase, yo
    **Context checkpoint:** The remaining steps (7–13) are mechanical and only require: the feature name, requirements GUID, requirements file path, feature branch name, and whether a ROADMAP.md update is applicable. The technical specification, implementation details, and code review findings are no longer needed. If the session context is approaching its limit, this is a safe point to compact.
 7. If the original requirements were provided as a file (step 2) and `./product/ROADMAP.md` exists, delegate the roadmap update to the `plan-roadmap` skill. The roadmap format, renumbering, file moves, and commit are all owned by that skill — `new-feature` should not perform these directly.
 
-   Invoke the `plan-roadmap` skill in a foreground agent with this instruction:
+   Use the **Skill tool** to invoke `plan-roadmap` with these args:
 
    > Mark feature `<feature-slug>` (GUID `<guid>`) as shipped. The requirements file is at `<current-path>`. Follow the "Marking a feature as shipped" procedure — do not run the full planning process.
 
-   When the agent returns, confirm it succeeded before continuing. If it reports an error (e.g. GUID not found), inform the user and skip roadmap updates for the remaining steps.
+   Do **not** use the Agent tool for this — always invoke it as a skill so that the `plan-roadmap` skill definition controls the process. When it returns, confirm it succeeded before continuing. If it reports an error (e.g. GUID not found), inform the user and skip roadmap updates for the remaining steps.
 8. Run the linting tool that's configured for the project.
 9. Run either the build command or mock deploy command for the project to ensure there are no build errors. Ensure that you do not build or deploy the project to production, you are only ensuring the project builds, deploys, or compiles correctly.
 10. Update README.md and CLAUDE.md in the project root for changes that are functionally noticeable to a user or developer of this codebase. Bug fixes, refactors, internal renaming, and test changes do not require documentation updates unless they change something observable from the outside.
@@ -134,9 +135,9 @@ The data handovers and sequencing listed in the steps above are:
 2. technical-spec agent analyses codebase, produces spec, confirms with user in its own session -> approved technical spec returned to you
 3. You hand the approved spec to BOTH implementer (background, isolated worktree) AND test-writer (background, isolated worktree) — these run in parallel
 4. Both agents write files and report what they created -> you commit implementer's work in its worktree, merge into the feature branch, remove its worktree -> then commit test-writer's work in its worktree, merge into the feature branch, remove its worktree -> compare test expectations against implementation and present any design discrepancies to the user for resolution -> run all tests
-5. coverage-reviewer checks for coverage tooling -> if found, runs coverage and returns report -> orchestrator presents findings to user, writes any requested tests, commits -> if no coverage tooling, step is skipped
+5. coverage-reviewer runs in a foreground agent (keeps analysis out of main context) -> checks for coverage tooling -> if found, runs coverage and returns report with all findings -> orchestrator presents every finding and any incidental findings to user for approval, writes requested tests, commits -> if no coverage tooling, step is skipped
 6. code-reviewer reviews and returns findings report -> orchestrator presents findings to user, makes approved fixes, runs tests, commits -> if requirements came from a file and changes were made, append out-of-spec section to requirements file
-7. If requirements came from a file and ROADMAP.md exists: delegated to `plan-roadmap` skill in a foreground agent (marks feature as shipped, renumbers sequence, moves file to `shipped/`, commits)
+7. If requirements came from a file and ROADMAP.md exists: delegated to `plan-roadmap` via the Skill tool (marks feature as shipped, renumbers sequence, moves file to `shipped/`, commits)
 8. Remaining steps (lint, build, docs, semver, PR with GUID) completed in order
 9. If roadmap was updated in step 7: add PR number to shipped entry, commit, push to PR branch
 

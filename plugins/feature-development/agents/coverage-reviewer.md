@@ -77,6 +77,10 @@ For each uncovered region:
 
 Do not flag lines that are inherently untestable (e.g. main entry points, framework boilerplate, type declarations).
 
+Report **every** uncovered region you find — do not cap, truncate, or summarise the list for brevity. If there are 2 findings, report 2. If there are 15, report 15. The orchestrating agent needs the complete picture to present to the user.
+
+If you notice **incidental issues** during analysis — pre-existing coverage gaps in files touched by this branch, test quality concerns, or patterns that suggest broader coverage problems — include them in a separate **Incidental findings** section after the main table. These are not strict uncovered-lines findings but are worth flagging.
+
 ---
 
 ### Step 5 — Return findings
