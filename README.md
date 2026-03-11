@@ -1,6 +1,6 @@
 # Software Development Life Cycle (SDLC) Plugins for Claude Code
 
-A collection of Claude Code plugins for product managers and developers who want structured, disciplined workflows across the full feature lifecycle — from defining an idea, to planning what to build next, to shipping and marketing it.
+A collection of Claude Code plugins for product managers and developers who want structured, disciplined workflows across the full product lifecycle — from defining an idea, to planning what to build next, to shipping it, assessing compliance, and marketing it.
 
 ## Installation
 
@@ -13,6 +13,8 @@ Add this repository as a plugin marketplace, then install the plugins you want:
 /plugin install roadmap@claude-sdlc-plugins
 /plugin install debugging@claude-sdlc-plugins
 /plugin install documentation@claude-sdlc-plugins
+/plugin install legal@claude-sdlc-plugins
+/plugin install marketing@claude-sdlc-plugins
 ```
 
 ## Plugins
@@ -123,6 +125,52 @@ Invoke it with `/write-changelog` inside Claude Code and provide one or more PR 
 Each entry contains a title, date, and 2–4 sentences of prose that describe what changed and why it matters — written entirely from the user's perspective, with no implementation details. The embedded style guide enforces a consistent voice: confident, direct, and brief.
 
 After presenting the entry, the skill asks whether you want it saved to disk as a Markdown file or if you're done.
+
+---
+
+### legal
+
+**Skills:** `search-trademark`, `assess-compliance`
+
+Research trademark conflicts and assess regulatory compliance for software products. The legal plugin helps you make informed decisions about naming and regulatory obligations — it provides research and analysis, not legal advice.
+
+#### search-trademark
+
+Invoke it with `/search-trademark` inside Claude Code and provide a proposed product or marketing name along with what the product does and the market it operates in. The skill invokes a research agent that searches trademark registries (USPTO, EUIPO, WIPO), existing products and brands, domain availability, SEO competition for the name, and linguistic/cultural concerns.
+
+The output is a structured report covering trademark registry findings, existing products and brands using the same or similar names, an SEO assessment of how hard it would be to own the name in search results, and an overall risk assessment (low/moderate/high). The skill then offers to brainstorm and research alternative names if the original has significant conflicts.
+
+#### assess-compliance
+
+Invoke it with `/assess-compliance` inside Claude Code. The skill scans the codebase for data-handling patterns (authentication, database schemas, third-party integrations, logging), reads product strategy and roadmap documents for context, asks clarifying questions about user geography and data types, then invokes a research agent to investigate applicable regulations.
+
+The output is a unified compliance report covering all applicable frameworks — GDPR, ePrivacy, EU AI Act, CCPA/CPRA, US state privacy laws, CAN-SPAM, COPPA, accessibility requirements, SOC 2, PCI DSS, and others identified during research. HIPAA is excluded by design. For each framework, the report presents three compliance levels (minimum viable, pragmatic, full) with honest trade-offs, enforcement context, and effort estimates so you can make informed decisions about where to invest.
+
+---
+
+### marketing
+
+**Skills:** `build-marketing-site`, `build-landing-page`, `evaluate-seo`
+
+Build user-focused marketing websites and landing pages, and evaluate SEO/GEO performance. The marketing plugin reads your product's strategy, roadmap, requirements, and codebase to generate compelling pages that talk about what the user gets — not what the product does.
+
+#### build-marketing-site
+
+Invoke it with `/build-marketing-site` inside Claude Code. The skill gathers context from your strategy, roadmap, requirements files, README, and codebase, then proposes a site structure (typically a single landing page). It auto-detects the project's framework (Next.js, Astro, Hugo, etc.) and generates pages accordingly, or falls back to standalone static HTML if no framework is found.
+
+The skill writes copy first and presents it for your approval before generating any code. Every sentence is tested against the question: "does this tell the reader something about their experience, or something about our technology?" Buzzwords are banned — every claim must be specific and concrete. After the site is generated, the skill offers to run `evaluate-seo` for search optimisation recommendations.
+
+#### build-landing-page
+
+Invoke it with `/build-landing-page` inside Claude Code and describe the page's purpose — a product comparison, a migration guide, a specific use case, or a campaign page. The skill follows the same user-focused principles as `build-marketing-site` but with a narrower scope: each landing page has one clear purpose and one clear action for the reader.
+
+For comparison pages, the skill takes a fair approach: it includes areas where the alternative is genuinely stronger, because honest comparisons build trust and perform better in search. For migration guides, it focuses on reducing the reader's anxiety about switching by being specific about what migration involves. The skill matches the style of any existing marketing site if one exists.
+
+#### evaluate-seo
+
+Invoke it with `/evaluate-seo` inside Claude Code. The skill can also be invoked automatically by `build-marketing-site` and `build-landing-page` after page generation. It evaluates pages for both traditional SEO and GEO (Generative Engine Optimisation — how content performs in AI-powered search engines like Google AI Overviews, Perplexity, and similar).
+
+The skill researches the competitive search landscape for your product's terms, analyses content quality and technical SEO, assesses GEO-specific factors (structured extractable answers, specificity, authoritative framing), and delivers 5–10 prioritised recommendations ranked by expected impact. It can implement changes directly, let you pick which recommendations to apply, or save the evaluation as a report.
 
 ---
 
